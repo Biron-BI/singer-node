@@ -1,85 +1,48 @@
-import {NullableObjectKeys} from "./utils"
+import {Record as ImmutableRecord} from "immutable"
 
-type Value = string | number | undefined | Record<string, string | number>
+/**
+ * Utilisation de Record Immutable.
+ *
+ * Pour: hyper clean à écrire, facile à tester, sécurisant
+ *
+ * Contre: perds les types sur les breadcrumbs, force l'utilisation d'immutable.js par quiconque utilise ces méthodes (ou à nous d'accepter du mutable et de fare une surcouche mais alourdirait beaucoup le code --> Le problème du non natif
+ */
+
+type Value = string | number | undefined | Record<string, any>
 
 interface Bookmark {
   offset?: Record<string, any>
-
   [k: string]: Value
 }
 
 type Bookmarks = Record<string, Bookmark>
 
-export interface State {
+export interface StateProps {
   bookmarks?: Bookmarks;
   currently_syncing?: string
 }
 
-export const write_bookmark = (state: State, tap_stream_id: string, key: string, value: Value): State => ({
-  ...state,
-  bookmarks: {
-    ...state.bookmarks,
-    [tap_stream_id]: {
-      ...state.bookmarks?.[tap_stream_id],
-      [key]: value,
-    },
-  },
-})
+const bookmarksRootKey = "bookmarks"
+const offsetRootKey = "offset"
 
-export const clear_bookmark = (state: State, tap_stream_id: string, key: string): State => ({
-  ...state,
-  bookmarks: {
-    ...state.bookmarks,
-    [tap_stream_id]: NullableObjectKeys(state.bookmarks?.[tap_stream_id])
-      ?.reduce((acc: Record<string, Value>, tap_key) => {
-        if (tap_key !== key) {
-          acc[tap_key] = state.bookmarks?.[tap_stream_id][tap_key]
-        }
-        return acc
-      }, {}) ?? {},
-  },
-})
+type State = ImmutableRecord<StateProps>
 
-export const reset_stream = (state: State, tap_stream_id: string): State => ({
-  ...state,
-  bookmarks: {
-    ...state.bookmarks,
-    [tap_stream_id]: {},
-  },
-})
+export const write_bookmark = (state: State, tap_stream_id: string, key: string, value: Value): State =>
+  state.setIn([bookmarksRootKey, tap_stream_id, key], value)
 
-export const get_bookmark = (state: State, tap_stream_id: string, key: string, default_value?: Value) => state.bookmarks?.[tap_stream_id]?.[key] ?? default_value
+export const clear_bookmark = (state: State, tap_stream_id: string, key: string): State => state.removeIn([bookmarksRootKey, tap_stream_id, key])
 
-export const set_offset = (state: State, tap_stream_id: string, offset_key: string, offset_value: Value): State => ({
-  ...state,
-  bookmarks: {
-    ...state.bookmarks,
-    [tap_stream_id]: {
-      ...state.bookmarks?.[tap_stream_id],
-      offset: {
-        ...state.bookmarks?.[tap_stream_id]?.offset,
-        [offset_key]: offset_value,
-      },
-    },
-  },
-})
+export const reset_stream = (state: State, tap_stream_id: string): State =>
+  state.removeIn([bookmarksRootKey, tap_stream_id])
 
-export const clear_offset = (state: State, tap_stream_id: string) => ({
-  ...state,
-  bookmarks: {
-    ...state.bookmarks,
-    [tap_stream_id]: {
-      ...state.bookmarks?.[tap_stream_id],
-      offset: {},
-    },
-  },
-})
+export const get_bookmark = (state: State, tap_stream_id: keyof Bookmark, key: string, default_value?: Value): Value => state.getIn([bookmarksRootKey, tap_stream_id, key]) as Value ?? default_value
 
-export const get_offset = (state: State, tap_stream_id: string, default_value?: Value) => state.bookmarks?.[tap_stream_id]?.offset ?? default_value
+export const set_offset = (state: State, tap_stream_id: string, offset_key: string, offset_value: Value): State => state.setIn([bookmarksRootKey, tap_stream_id, offsetRootKey, offset_key], offset_value)
 
-export const get_currently_syncing = (state: State, default_value?: string) => state.currently_syncing ?? default_value
+export const clear_offset = (state: State, tap_stream_id: string) => state.removeIn([bookmarksRootKey, tap_stream_id, offsetRootKey])
 
-export const set_currently_syncing = (state: State, tap_stream_id: string): State => ({
-  ...state,
-  currently_syncing: tap_stream_id
-})
+export const get_offset = (state: State, tap_stream_id: string, default_value?: Value) => state.getIn([bookmarksRootKey, tap_stream_id, offsetRootKey] ?? default_value)
+
+export const get_currently_syncing = (state: State, default_value?: string) => state.get("currently_syncing") ?? default_value
+
+export const set_currently_syncing = (state: State, tap_stream_id: string): State => state.set("currently_syncing", tap_stream_id)
