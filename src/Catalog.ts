@@ -1,56 +1,29 @@
-import {Schema} from "../src/Schema"
+import {log_warning} from "logger"
+import {List} from "immutable"
+import {CatalogEntry} from "CatalogEntry"
 
-class CatalogEntry {
-  tap_stream_id?: number
-  stream?: unknown
-  key_properties?: string[]
-  schema?: Schema
-  replication_key?: string
-  is_view?: unknown
-  database?: unknown
-  table?: unknown
-  row_count?: unknown
-  stream_alias?: unknown
-  metadata?: unknown
-  replication_method?: unknown
-
-  constructor(
-    tap_stream_id?: number,
-    stream?: unknown,
-    key_properties?: string[],
-    schema?: Schema,
-    replication_key?: string,
-    is_view?: unknown,
-    database?: unknown,
-    table?: unknown,
-    row_count?: unknown,
-    stream_alias?: unknown,
-    metadata?: unknown,
-    replication_method?: unknown,
-  ) {
-    this.tap_stream_id = tap_stream_id
-    this.stream = stream
-    this.key_properties = key_properties
-    this.schema = schema
-    this.replication_key = replication_key
-    this.is_view = is_view
-    this.database = database
-    this.table = table
-    this.row_count = row_count
-    this.stream_alias = stream_alias
-    this.metadata = metadata
-    this.replication_method = replication_method
+export class Catalog {
+  private streams: List<CatalogEntry>
+  constructor(streams: CatalogEntry[]) {
+    this.streams = List(streams)
   }
-  //
-  // is_selected() {
-  //   return this.schema?.selected || false // todo
-  // }
-  //
-  // to_dict() {
-  //   return JSON.stringify(this)
-  // }
-}
 
-class Catalog {
+  // Would be way cleaner but forces use of immutable js
+  // constructor(private streams: List<CatalogEntry>) {}
 
+
+  dump() {
+    if (this.streams.size === 0) {
+      log_warning("Catalog being written with no streams.")
+    }
+    console.log(this.toJSON())
+  }
+
+  toJSON() {
+    return JSON.stringify({...this}, null, 2)
+  }
+
+  get_stream(tap_stream_id: string) {
+    return this.streams.find((stream) => stream.tap_stream_id === tap_stream_id)
+  }
 }

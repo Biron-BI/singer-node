@@ -1,40 +1,51 @@
-export class Schema {
-  private type?: string
-  private items?: unknown
-  private properties?: unknown
-  private selected?: unknown
-  private inclusion?: unknown
-  private description?: unknown
-  private minimum?: unknown
-  private maximum?: unknown
-  private exclusiveMinimum?: unknown
-  private exclusiveMaximum?: unknown
-  private multipleOf?: unknown
-  private maxLength?: unknown
-  private minLength?: unknown
-  private anyOf?: unknown
-  private format?: unknown
-  private additionalProperties?: unknown
-  private patternProperties?: unknown
+import {JSONSchema7, JSONSchema7Definition, JSONSchema7TypeName} from "json-schema"
 
-  constructor(
-    type?: string,
-    items?: unknown,
-    properties?: unknown,
-    selected?: unknown,
-    inclusion?: unknown,
-    description?: unknown,
-    minimum?: unknown,
-    maximum?: unknown,
-    exclusiveMinimum?: unknown,
-    exclusiveMaximum?: unknown,
-    multipleOf?: unknown,
-    maxLength?: unknown,
-    minLength?: unknown,
-    anyOf?: unknown,
-    format?: unknown,
-    additionalProperties?: unknown,
-    patternProperties?: unknown,
+interface ExtendedJSONSchema7 extends JSONSchema7 {
+  selected: boolean,
+  inclusion: unknown
+}
+
+// Awaiting merge of this PR for a cleaner declaration
+// https://github.com/microsoft/TypeScript/pull/44912
+// https://github.com/microsoft/TypeScript/issues/5326
+export class Schema implements ExtendedJSONSchema7 {
+  type
+  items
+  properties
+  description
+  minimum
+  maximum
+  exclusiveMinimum
+  exclusiveMaximum
+  multipleOf
+  maxLength
+  minLength
+  anyOf
+  format
+  additionalProperties
+  patternProperties
+  selected
+  inclusion
+
+  constructor({
+                type,
+                items,
+                properties,
+                selected,
+                inclusion,
+                description,
+                minimum,
+                maximum,
+                exclusiveMinimum,
+                exclusiveMaximum,
+                multipleOf,
+                maxLength,
+                minLength,
+                anyOf,
+                format,
+                additionalProperties,
+                patternProperties,
+              }: ExtendedJSONSchema7,
   ) {
     this.type = type
     this.properties = properties
