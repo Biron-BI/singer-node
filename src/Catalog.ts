@@ -11,8 +11,7 @@ export class Catalog {
 
 
   // Forces use of immutable js
-  constructor(private streams: List<CatalogEntry>) {
-  }
+  constructor(private streams: List<CatalogEntry>) {}
 
   add_stream(stream: CatalogEntry) {
     return new Catalog(this.streams.push(stream))
