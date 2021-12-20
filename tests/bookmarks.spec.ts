@@ -1,12 +1,12 @@
 import {strict as assert} from 'assert'
-import {clear_bookmark, get_bookmark, StateProps, write_bookmark} from "../src/bookmarks"
+import {clear_bookmark, get_bookmark, StateProps, write_bookmark} from "bookmarks"
 import {Record} from "immutable"
 
 const stream_id_1 = 'customers'
 const bookmark_key_1 = 'datetime'
 const bookmark_val_1 = 123456789
 
-const StateFactory = Record<StateProps>({
+export const StateFactory = Record<StateProps>({
   bookmarks: {},
 })
 

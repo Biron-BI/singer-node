@@ -1,15 +1,16 @@
 import {Schema} from "Schema"
+import {List} from "immutable"
 
 interface ReplicationMetadata {
-  "table-key-properties": string[];
-  "forced-replication-method": string;
-  "valid-replication-keys": string[];
-  selected: boolean;
-  inclusion: string;
+  "table-key-properties"?: List<string>;
+  "forced-replication-method"?: string;
+  "valid-replication-keys"?: List<string>;
+  selected?: boolean;
+  inclusion?: string;
 }
 
 interface CatalogMetadata {
-  breadcrumb: string[]
+  breadcrumb: List<string>
   metadata: ReplicationMetadata
 }
 
@@ -17,8 +18,8 @@ interface ICatalogEntry {
   tap_stream_id?: string
   stream?: string
   schema?: Schema
-  metadata?: CatalogMetadata
-  key_properties?: string[]
+  metadata?: List<CatalogMetadata>
+  key_properties?: List<string>
   replication_key?: string
   is_view?: boolean
   database?: string
@@ -73,11 +74,12 @@ export class CatalogEntry implements ICatalogEntry {
     this.replication_method = replication_method
   }
 
+  // Entry is selected if said so in the schema or if in metadata.
+  // Metadata for the stream has en empty breadcrumb
+  is_selected() {
+    return this.schema?.selected || this.metadata?.find((mdata) => mdata.breadcrumb.isEmpty())?.metadata.selected
+  }
 
-  //
-  // is_selected() {
-  //   return this.schema?.selected || false // todo
-  // }
   //
   // to_dict() {
   //   return JSON.stringify(this)

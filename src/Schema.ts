@@ -1,8 +1,8 @@
-import {JSONSchema7, JSONSchema7Definition, JSONSchema7TypeName} from "json-schema"
+import {JSONSchema7} from "json-schema"
 
 interface ExtendedJSONSchema7 extends JSONSchema7 {
-  selected: boolean,
-  inclusion: unknown
+  selected?: boolean,
+  inclusion?: unknown
 }
 
 // Awaiting merge of this PR for a cleaner declaration

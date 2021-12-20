@@ -28,7 +28,7 @@ export interface StateProps {
 const bookmarksRootKey = "bookmarks"
 const offsetRootKey = "offset"
 
-type State = ImmutableRecord<StateProps>
+export type State = ImmutableRecord<StateProps>
 
 export const write_bookmark = (state: State, tap_stream_id: string, key: string, value: Value): State =>
   state.setIn([bookmarksRootKey, tap_stream_id, key], value)
