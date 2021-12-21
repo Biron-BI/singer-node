@@ -1,0 +1,7 @@
+{
+  "definitions": {
+    "string_type": {
+      "type": "string"
+    }
+  }
+}

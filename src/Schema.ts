@@ -9,23 +9,23 @@ interface ExtendedJSONSchema7 extends JSONSchema7 {
 // https://github.com/microsoft/TypeScript/pull/44912
 // https://github.com/microsoft/TypeScript/issues/5326
 export class Schema implements ExtendedJSONSchema7 {
-  type
-  items
-  properties
-  description
-  minimum
-  maximum
-  exclusiveMinimum
-  exclusiveMaximum
-  multipleOf
-  maxLength
-  minLength
-  anyOf
-  format
-  additionalProperties
-  patternProperties
-  selected
-  inclusion
+  type?
+  items?
+  properties?
+  description?
+  minimum?
+  maximum?
+  exclusiveMinimum?
+  exclusiveMaximum?
+  multipleOf?
+  maxLength?
+  minLength?
+  anyOf?
+  format?
+  additionalProperties?
+  patternProperties?
+  selected?
+  inclusion?
 
   constructor({
                 type,

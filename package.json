@@ -25,6 +25,7 @@
   "dependencies": {
     "commander": "^8.3.0",
     "immutable": "^4.0.0",
+    "json-schema-ref-parser": "^9.0.9",
     "loglevel": "^1.8.0"
   },
   "devDependencies": {
