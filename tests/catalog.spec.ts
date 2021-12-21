@@ -44,6 +44,11 @@ describe("Write Catalog", () => {
       "          \"breadcrumb\": []\n" +
       "        }\n" +
       "      ]\n" +
+      "    },\n" +
+      "    {\n" +
+      "      \"tap_stream_id\": \"b\",\n" +
+      "      \"schema\": {},\n" +
+      "      \"metadata\": []\n" +
       "    }\n" +
       "  ]\n" +
       "}")

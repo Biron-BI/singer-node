@@ -2,7 +2,6 @@ import {List} from "immutable"
 import {Command} from "commander"
 import * as fs from "fs"
 
-
 export function load_json(filePath: string) {
   return JSON.parse(fs.readFileSync(filePath).toString())
 }
