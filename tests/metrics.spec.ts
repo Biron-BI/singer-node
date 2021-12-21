@@ -8,13 +8,13 @@ async function sleep(ms: number) {
 /*
   Immutability is a pain for Counter ?
   How to test ? Catch console outputs ?
+  In python, singer does set internal method to "lambda" so it returns instantly. We can't do this here
  */
-describe("Record Counter", () => {
-  it("should display increment", async () => {
-    const counter = new Counter("users", 0, {}, 500)
-    const updated = counter.increment(32).increment(123).increment(1)
-    await sleep(1000)
-    updated.increment(32).end()
-  })
-
-})
+// describe("Record Counter", () => {
+//   it("should display increment", async () => {
+//     const counter = new Counter("users", 0, {}, 500)
+//     const updated = counter.increment(32).increment(123).increment(1)
+//     await sleep(1000)
+//     updated.increment(32).end()
+//   })
+// })
