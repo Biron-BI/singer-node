@@ -1,7 +1,7 @@
-import {log_info, log_warning} from "logger"
+import {log_info, log_warning} from "./logger"
 import {List} from "immutable"
-import {CatalogEntry} from "CatalogEntry"
-import {State} from "bookmarks"
+import {CatalogEntry} from "./CatalogEntry"
+import {State} from "./bookmarks"
 
 export class Catalog {
   // private streams: List<CatalogEntry>

@@ -1,7 +1,26 @@
-import {Schema} from "Schema"
+import {Schema} from "./Schema"
 import {List} from "immutable"
 
-enum MessageType {
+
+export interface SchemaMessageContent {
+  type: MessageType.schema
+  stream: string
+  schema: Schema,
+  key_properties: string[]
+  bookmark_properties?: string[]
+}
+
+export interface StateMessageContent {
+  type: MessageType.state
+}
+
+export interface RecordMessageContent {
+  type: MessageType.state
+}
+
+export type MessageContent = SchemaMessageContent | StateMessageContent | RecordMessageContent
+
+export enum MessageType {
   record = 'RECORD',
   schema = 'SCHEMA',
   state = 'STATE',
@@ -45,13 +64,13 @@ class SchemaMessage extends Message {
     super()
   }
 
-  public asObject(): Record<string, any> {
+  public asObject(): SchemaMessageContent {
     return {
       type: MessageType.schema,
       stream: this.stream,
       schema: this.schema,
-      key_properties: this.key_properties,
-      ...(this.bookmark_properties && {bookmark_properties: this.bookmark_properties}),
+      key_properties: this.key_properties.toArray(),
+      ...(this.bookmark_properties && {bookmark_properties: this.bookmark_properties.toArray()}),
     }
   }
 }

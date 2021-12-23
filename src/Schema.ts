@@ -1,6 +1,6 @@
 import {JSONSchema7} from "json-schema"
 
-interface ExtendedJSONSchema7 extends JSONSchema7 {
+export interface ExtendedJSONSchema7 extends JSONSchema7 {
   selected?: boolean,
   inclusion?: unknown
 }

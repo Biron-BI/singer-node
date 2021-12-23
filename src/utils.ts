@@ -38,5 +38,5 @@ export function parse_args(required_keys: List<string>) {
     throw new Error(`Config is missing required keys: ${missing_keys}`)
   }
 
-  return {}
+  return ret
 }

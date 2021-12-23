@@ -1,5 +1,5 @@
 import {strict as assert} from 'assert'
-import {clear_bookmark, get_bookmark, StateProps, write_bookmark} from "bookmarks"
+import {clear_bookmark, get_bookmark, StateProps, write_bookmark} from "../src/bookmarks"
 import {Record} from "immutable"
 
 const stream_id_1 = 'customers'

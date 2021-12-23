@@ -10,7 +10,7 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "lib": ["es2015", "dom"],
-    "baseUrl": "./src",
+//    "baseUrl": "./src", Commenting base url as it breaks library typings
     "paths": {
     }
   },

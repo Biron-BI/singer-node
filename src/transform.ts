@@ -1,4 +1,4 @@
-import {Schema} from "Schema"
+import {Schema} from "./Schema"
 import * as $RefParser from "@apidevtools/json-schema-ref-parser"
 import * as path from "path"
 import {promises as fs} from "fs"

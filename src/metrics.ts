@@ -1,4 +1,4 @@
-import {log_info} from "logger"
+import {log_info} from "./logger"
 
 const DEFAULT_LOG_INTERVAL = 60 * 1000
 

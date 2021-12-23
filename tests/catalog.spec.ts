@@ -1,8 +1,8 @@
 import {strict as assert} from "assert"
-import {Catalog} from "Catalog"
+import {Catalog} from "../src/Catalog"
 import {List} from "immutable"
-import {CatalogEntry} from "CatalogEntry"
-import {Schema} from "Schema"
+import {CatalogEntry} from "../src/CatalogEntry"
+import {Schema} from "../src/Schema"
 import {StateFactory} from "./bookmarks.spec"
 
 const selected_catalog_entry = new CatalogEntry({

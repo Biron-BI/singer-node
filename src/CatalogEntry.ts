@@ -1,4 +1,4 @@
-import {Schema} from "Schema"
+import {Schema} from "./Schema"
 import {List} from "immutable"
 
 interface ReplicationMetadata {

@@ -1,5 +1,5 @@
 import {strict as assert} from 'assert'
-import {resolve_schema_references} from "transform.py"
+import {resolve_schema_references} from "../src/transform"
 import {JSONSchema7} from "json-schema"
 
 describe("Resolve schemas", () => {
