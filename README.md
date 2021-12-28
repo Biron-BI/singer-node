@@ -10,6 +10,8 @@ Data that transits should be defined as standard data models
 
 We are stricter about 'null' than target-postgres --> may come back to bite us later, should be checked
 
+We chose to base schema state on show create table request --> Not the cleanest but liek this we don't have to create temp table to compare
+
 
 ## Biron Notes
 
