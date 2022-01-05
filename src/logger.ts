@@ -1,13 +1,31 @@
-import log from "loglevel"
+export enum LogLevel {
+  TRACE,
+  DEBUG,
+  INFO,
+  WARN,
+  ERROR,
+  FATAL
+}
 
-export const log_debug = (msg: string) => log.debug(msg)
+let configLevel = LogLevel.TRACE
 
-export const log_info = (msg: string) => log.info(msg)
+function write(logLevel: LogLevel, msg: string) {
+  if (logLevel >= configLevel) {
+    process.stderr.write(`[${LogLevel[logLevel]}] ${msg}\n`)
+  }
+}
 
-export const log_warning = (msg: string) => log.warn(msg)
+export const log_debug = (msg: string) => write(LogLevel.DEBUG, msg)
 
-export const log_error = (msg: string) => log.error(msg)
+export const log_info = (msg: string) => write(LogLevel.INFO, msg)
 
-export const log_critical = (msg: string) => log.error(`[CRITICAL] ${msg}`)
+export const log_warning = (msg: string) => write(LogLevel.WARN, msg)
 
-export const log_fatal = (msg: string) => log.error(`[FATAL] ${msg}`)
+export const log_error = (msg: string) => write(LogLevel.ERROR, msg)
+
+export const log_critical = (msg: string) => write(LogLevel.FATAL, msg)
+
+export const log_fatal = (msg: string) => write(LogLevel.FATAL, msg)
+
+export const set_level = (newLevel: LogLevel) => configLevel = newLevel
+

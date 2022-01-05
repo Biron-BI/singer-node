@@ -1,5 +1,6 @@
 import {Schema} from "./Schema"
 import {List} from "immutable"
+import {StateProps} from "./bookmarks"
 
 
 export interface SchemaMessageContent {
@@ -7,15 +8,20 @@ export interface SchemaMessageContent {
   stream: string
   schema: Schema,
   key_properties: string[]
+  cleaningColumn?: string
+  cleanFirst: boolean
   bookmark_properties?: string[]
 }
 
 export interface StateMessageContent {
   type: MessageType.state
+  value: StateProps
 }
 
 export interface RecordMessageContent {
-  type: MessageType.state
+  type: MessageType.record
+  record: Record<string, any>
+  stream: string
 }
 
 export type MessageContent = SchemaMessageContent | StateMessageContent | RecordMessageContent
@@ -26,7 +32,7 @@ export enum MessageType {
   state = 'STATE',
 }
 
-// TODO in singer, this should be a timezone aware datetime
+// Not timezone aware, could be improved
 type TimeExtracted = number
 
 abstract class Message {
@@ -60,6 +66,8 @@ class SchemaMessage extends Message {
     private readonly schema: Schema,
     private readonly key_properties: List<string>,
     private readonly bookmark_properties?: List<string>,
+    private readonly cleaningColumn?: string,
+    private readonly cleanFirst = false,
   ) {
     super()
   }
@@ -70,6 +78,8 @@ class SchemaMessage extends Message {
       stream: this.stream,
       schema: this.schema,
       key_properties: this.key_properties.toArray(),
+      cleanFirst: this.cleanFirst,
+      cleaningColumn: this.cleaningColumn,
       ...(this.bookmark_properties && {bookmark_properties: this.bookmark_properties.toArray()}),
     }
   }

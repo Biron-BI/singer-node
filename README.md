@@ -1,21 +1,58 @@
 # singer-node
-Writes the Singer format from Python
 
+Writes the Singer format from Node. 
 
-## Dev notes
+Provide functions and classes to help write the Singer format from node.
 
-All objects should be immutable.
+Based on [singer-python](https://github.com/singer-io/singer-python)
 
-Data that transits should be defined as standard data models
+## Usage
 
-We are stricter about 'null' than target-postgres --> may come back to bite us later, should be checked
+`npm install singer-node`
 
-We chose to base schema state on show create table request --> Not the cleanest but liek this we don't have to create temp table to compare
+```typescript
+import {write_schema, write_records, write_state} from "singer-node"
 
+write_schema('my_table',
+  {'properties': {'id': {'type': 'string', 'key': True}}},
+  ['id'])
+write_records('my_table',
+  [{'id': 'b'}, {'id': 'd'}])
+write_state({'my_table': 'd'})
+``` 
 
-## Biron Notes
+## Contributing
 
-Difference with current system:
-* To access deep nested children array we store index of array for each level instead of _parent_ and _root_
-* children tables with 2 underscores `__` for more clarity 
-* 'required' field is not used anymore: nullable is defined by types (["number", "null"]). PK are never nullable.
+Feel free to open up issues and pull requests, we'll be happy to review them.
+
+### Immutable
+
+This library is built without any mutable data and should remain so. The library [immutable-js](https://immutable-js.com/) is used.
+
+### Tests
+
+Code is fully tested using mocha
+
+Simply run
+
+```sh
+yarn test
+```
+
+## Sponsorship
+
+Singer-node is written and maintained by **Biron** https://birondata.com/
+
+## Acknowledgements
+
+Special thanks to the people who built
+
+* [singer](https://github.com/singer-io/getting-started)
+* [singer-python](https://github.com/singer-io/singer-python)
+* [immutable-js](https://immutable-js.com/)
+
+## License
+
+Copyright © 2021 Biron
+
+Distributed under the AGPLv3
