@@ -1,4 +1,10 @@
-import {Schema} from "./Schema"
+import {
+  MutableSchemaKeyProperties,
+  Schema,
+  SchemaKeyProperties,
+  schemaKeyPropertiesToImmutable,
+  schemaKeyPropertiesToMutable,
+} from "./Schema"
 import {List} from "immutable"
 import {StateProps} from "./bookmarks"
 
@@ -11,6 +17,7 @@ export interface SchemaMessageContent {
   cleaningColumn?: string
   cleanFirst: boolean
   bookmark_properties?: string[]
+  all_key_properties?: MutableSchemaKeyProperties
 }
 
 export interface StateMessageContent {
@@ -35,39 +42,45 @@ export enum MessageType {
 // Not timezone aware, could be improved
 type TimeExtracted = number
 
-abstract class Message {
-  public abstract asObject(): Record<string, any>;
+export abstract class Message {
+  public abstract asObject(): MessageContent;
 }
 
-class RecordMessage extends Message {
+export class RecordMessage extends Message {
+  readonly type = MessageType.record
+
   constructor(
-    private readonly stream: string,
-    private readonly record: Record<string, any>,
-    private readonly version?: string,
-    private readonly time_extracted?: TimeExtracted,
+    public readonly stream: string,
+    public readonly record: Record<string, any>,
+    public readonly version?: string,
+    public readonly time_extracted?: TimeExtracted,
   ) {
     super()
   }
 
-  public asObject(): Record<string, any> {
+  public asObject(): RecordMessageContent {
     return {
       type: MessageType.record,
       stream: this.stream,
       record: this.record,
       ...(this.version && {version: this.version}),
-      ...(this.time_extracted && {time_extracted: this.time_extracted}), // TODO Handle date
+      ...(this.time_extracted && {time_extracted: this.time_extracted}),
     }
   }
 }
 
-class SchemaMessage extends Message {
+export class SchemaMessage extends Message {
+  readonly type = MessageType.schema
+
   constructor(
-    private readonly stream: string,
-    private readonly schema: Schema,
-    private readonly key_properties: List<string>,
-    private readonly bookmark_properties?: List<string>,
-    private readonly cleaningColumn?: string,
-    private readonly cleanFirst = false,
+    public readonly stream: string,
+    public readonly schema: Schema,
+    public readonly key_properties: List<string>,
+    public readonly bookmark_properties?: List<string>,
+    public readonly cleaningColumn?: string,
+    public readonly cleanFirst = false,
+    public readonly all_key_properties?: SchemaKeyProperties
+
   ) {
     super()
   }
@@ -80,19 +93,22 @@ class SchemaMessage extends Message {
       key_properties: this.key_properties.toArray(),
       cleanFirst: this.cleanFirst,
       cleaningColumn: this.cleaningColumn,
+      all_key_properties: schemaKeyPropertiesToMutable(this.all_key_properties),
       ...(this.bookmark_properties && {bookmark_properties: this.bookmark_properties.toArray()}),
     }
   }
 }
 
-class StateMessage extends Message {
+export class StateMessage extends Message {
+  readonly type = MessageType.state
+
   constructor(
-    private readonly value: string | number,
+    public readonly value: StateProps,
   ) {
     super()
   }
 
-  public asObject(): Record<string, any> {
+  public asObject(): StateMessageContent {
     return {
       type: MessageType.state,
       value: this.value,
@@ -100,7 +116,7 @@ class StateMessage extends Message {
   }
 }
 
-// Throw exceptions if key not in record. Otherwise, return value. Could use JSON Schema validation for more precise validation with less code
+// Throw exceptions if key not in record. Otherwise, return value.
 function ensure_key_defined(obj: Record<string, any>, key: string) {
   if (!Object.keys(obj).includes(key)) {
     throw new Error(`Message is missing required key : '${key}': ${obj}`)
@@ -108,7 +124,7 @@ function ensure_key_defined(obj: Record<string, any>, key: string) {
   return obj[key]
 }
 
-export function parse_message(msg: string): Message {
+export function parse_message(msg: string): RecordMessage | StateMessage | SchemaMessage {
   const obj = JSON.parse(msg)
   const msg_type: MessageType = ensure_key_defined(obj, "type")
 
@@ -124,8 +140,11 @@ export function parse_message(msg: string): Message {
       return new SchemaMessage(
         ensure_key_defined(obj, "stream"),
         ensure_key_defined(obj, "schema"),
-        ensure_key_defined(obj, "key_properties"),
-        obj["bookmark_properties"],
+        List(ensure_key_defined(obj, "key_properties")),
+        List(obj["bookmark_properties"] ?? []),
+        obj["cleaningColumn"],
+        obj["cleanFirst"],
+        schemaKeyPropertiesToImmutable(obj["all_key_properties"]),
       )
     case MessageType.state:
       return new StateMessage(ensure_key_defined(obj, 'value'))
@@ -144,4 +163,4 @@ export const write_records = (stream: string, records: List<Record<string, any>>
 
 export const write_schema = (stream: string, schema: Schema, key_properties: List<string>, bookmark_properties?: List<string>, stream_alias?: string) => write_message(new SchemaMessage(stream_alias || stream, schema, key_properties, bookmark_properties))
 
-export const write_state = (value: string | number) => write_message(new StateMessage(value))
+export const write_state = (value: StateProps) => write_message(new StateMessage(value))

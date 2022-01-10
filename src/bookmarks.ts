@@ -1,16 +1,5 @@
 import {Record as ImmutableRecord} from "immutable"
 
-/**
- * Utilisation de Record Immutable.
- *
- * Pour: hyper clean à écrire, facile à tester, sécurisant
- *
- * Contre:
- *  perds les types sur les breadcrumbs
- *  force l'utilisation d'immutable.js par quiconque utilise ces méthodes (ou à nous d'accepter du mutable et de fare une surcouche mais alourdirait beaucoup le code --> Le problème du non natif
- *  ajoute des packets 'inutiles' à une librairie
- */
-
 type Value = string | number | undefined | Record<string, any>
 
 interface Bookmark {

@@ -79,9 +79,4 @@ export class CatalogEntry implements ICatalogEntry {
   is_selected() {
     return this.schema?.selected || this.metadata?.find((mdata) => mdata.breadcrumb.isEmpty())?.metadata.selected
   }
-
-  //
-  // to_dict() {
-  //   return JSON.stringify(this)
-  // }
 }

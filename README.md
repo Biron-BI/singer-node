@@ -14,7 +14,7 @@ Based on [singer-python](https://github.com/singer-io/singer-python)
 import {write_schema, write_records, write_state} from "singer-node"
 
 write_schema('my_table',
-  {'properties': {'id': {'type': 'string', 'key': True}}},
+  {'properties': {'id': {'type': 'string'}}},
   ['id'])
 write_records('my_table',
   [{'id': 'b'}, {'id': 'd'}])

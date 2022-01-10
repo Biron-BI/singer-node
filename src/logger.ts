@@ -9,9 +9,11 @@ export enum LogLevel {
 
 let configLevel = LogLevel.TRACE
 
+let prefix = ""
+
 function write(logLevel: LogLevel, msg: string) {
   if (logLevel >= configLevel) {
-    process.stderr.write(`[${LogLevel[logLevel]}] ${msg}\n`)
+    process.stderr.write(`${prefix && `[${prefix}] `}[${LogLevel[logLevel]}] ${msg}\n`)
   }
 }
 
@@ -28,4 +30,6 @@ export const log_critical = (msg: string) => write(LogLevel.FATAL, msg)
 export const log_fatal = (msg: string) => write(LogLevel.FATAL, msg)
 
 export const set_level = (newLevel: LogLevel) => configLevel = newLevel
+
+export const set_prefix = (newPrefix: string) => prefix = newPrefix
 

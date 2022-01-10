@@ -4,14 +4,8 @@ import {CatalogEntry} from "./CatalogEntry"
 import {State} from "./bookmarks"
 
 export class Catalog {
-  // private streams: List<CatalogEntry>
-  // constructor(streams: CatalogEntry[]) {
-  //   this.streams = List(streams)
-  // }
-
-
-  // Forces use of immutable js
-  constructor(private readonly streams: List<CatalogEntry>) {}
+  constructor(private readonly streams: List<CatalogEntry>) {
+  }
 
   add_stream(stream: CatalogEntry) {
     return new Catalog(this.streams.push(stream))
