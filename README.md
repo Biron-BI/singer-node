@@ -1,6 +1,6 @@
 # singer-node
 
-Writes the Singer format from Node. 
+Writes the Singer format from Node.
 
 Provide functions and classes to help write the Singer format from node.
 
@@ -12,31 +12,28 @@ Based on [singer-python](https://github.com/singer-io/singer-python)
 
 ```typescript
 import {write_schema, write_records, write_state} from "singer-node"
+import {List} from "immutable"
 
-write_schema('my_table',
-  {'properties': {'id': {'type': 'string'}}},
-  ['id'])
+write_schema('my_table', {
+    properties: {
+      id: {
+        type: 'string'
+      }
+    }
+  },
+  List(['id'])
+)
 write_records('my_table',
-  [{'id': 'b'}, {'id': 'd'}])
-write_state({'my_table': 'd'})
-``` 
-
-## Contributing
-
-Feel free to open up issues and pull requests, we'll be happy to review them.
-
-### Immutable
-
-This library is built without any mutable data and should remain so. The library [immutable-js](https://immutable-js.com/) is used.
-
-### Tests
-
-Code is fully tested using mocha
-
-Simply run
-
-```sh
-yarn test
+  List([{
+    id: 'b'
+  }, {
+    id: 'd'
+  }])
+)
+write_state({
+  bookmarks: 
+    {my_table: 'd'}
+})
 ```
 
 ## Sponsorship
