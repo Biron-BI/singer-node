@@ -75,11 +75,11 @@ export class SchemaMessage extends Message {
   constructor(
     public readonly stream: string,
     public readonly schema: Schema,
-    public readonly key_properties: List<string>,
-    public readonly bookmark_properties?: List<string>,
+    public readonly keyProperties: List<string>,
+    public readonly bookmarkProperties?: List<string>,
     public readonly cleaningColumn?: string,
     public readonly cleanFirst = false,
-    public readonly all_key_properties?: SchemaKeyProperties
+    public readonly allKeyProperties?: SchemaKeyProperties
 
   ) {
     super()
@@ -90,11 +90,11 @@ export class SchemaMessage extends Message {
       type: MessageType.schema,
       stream: this.stream,
       schema: this.schema,
-      key_properties: this.key_properties.toArray(),
+      key_properties: this.keyProperties.toArray(),
       cleanFirst: this.cleanFirst,
       cleaningColumn: this.cleaningColumn,
-      all_key_properties: schemaKeyPropertiesToMutable(this.all_key_properties),
-      ...(this.bookmark_properties && {bookmark_properties: this.bookmark_properties.toArray()}),
+      all_key_properties: schemaKeyPropertiesToMutable(this.allKeyProperties),
+      ...(this.bookmarkProperties && {bookmark_properties: this.bookmarkProperties.toArray()}),
     }
   }
 }
@@ -142,8 +142,8 @@ export function parse_message(msg: string): RecordMessage | StateMessage | Schem
         ensure_key_defined(obj, "schema"),
         List(ensure_key_defined(obj, "key_properties")),
         List(obj["bookmark_properties"] ?? []),
-        obj["cleaningColumn"],
-        obj["cleanFirst"],
+        obj["cleaning_column"],
+        obj["clean_first"],
         schemaKeyPropertiesToImmutable(obj["all_key_properties"]),
       )
     case MessageType.state:

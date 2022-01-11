@@ -50,6 +50,6 @@ Special thanks to the people who built
 
 ## License
 
-Copyright © 2021 Biron
+Copyright © 2022 Biron
 
 Distributed under the AGPLv3
