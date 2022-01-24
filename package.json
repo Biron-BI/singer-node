@@ -17,8 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/Biron-BI/singer-node.git"
   },
-  "author": "",
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "bugs": {
     "url": "https://github.com/Biron-BI/singer-node/issues"
   },
