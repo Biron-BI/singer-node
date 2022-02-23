@@ -75,8 +75,19 @@ export class CatalogEntry implements ICatalogEntry {
   }
 
   // Entry is selected if said so in the schema or if in metadata.
+  static fromJSON = (c: Record<string, any>) => new CatalogEntry({
+    ...c,
+    schema: Schema.fromJSON(c.schema),
+    metadata: List(List(c.metadata.map((mdata: any) => ({
+      breadcrumb: List(mdata.breadcrumb),
+      metadata: {
+        ...mdata.metadata,
+        "table-key-properties": List(mdata.metadata["table-key-properties"]),
+        "valid-replication-keys": List(mdata.metadata["valid-replication-keys"]),
+      }
+    }))))
+  })
+
   // Metadata for the stream has en empty breadcrumb
-  is_selected() {
-    return this.schema?.selected || this.metadata?.find((mdata) => mdata.breadcrumb.isEmpty())?.metadata.selected
-  }
+  is_selected = () => this.schema?.selected || this.metadata?.find((mdata) => mdata.breadcrumb.isEmpty())?.metadata.selected
 }

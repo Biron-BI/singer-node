@@ -99,4 +99,6 @@ export class Schema implements ExtendedJSONSchema7 {
     this.additionalProperties = additionalProperties
     this.patternProperties = patternProperties
   }
+
+  static fromJSON = (c: Record<string, any>) => new Schema(c)
 }

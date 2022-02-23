@@ -17,7 +17,7 @@ describe("Resolve schemas", () => {
         },
       },
     }
-    const resolved = await resolve_schema_references(schema)
+    const resolved = await resolve_schema_references(schema, "")
 
     // @ts-ignore ts is drunk
     assert.equal(resolved?.["properties"]?.["name"]?.["type"], "string")

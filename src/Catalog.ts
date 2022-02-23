@@ -7,10 +7,11 @@ export class Catalog {
   constructor(private readonly streams: List<CatalogEntry>) {
   }
 
+  static fromJSON = (c: Record<string, any>) => new Catalog(List(c.streams.map(CatalogEntry.fromJSON)))
+
   add_stream(stream: CatalogEntry) {
     return new Catalog(this.streams.push(stream))
   }
-
 
   dump() {
     if (this.streams.size === 0) {
