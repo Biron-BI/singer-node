@@ -32,27 +32,26 @@ enum Tag {
  * Version immutable qui retourne des copies à chaque fois ?
  */
 export class Counter {
-  private readonly last_log_time: number
 
   constructor(
     private readonly metric: string,
     private readonly value: number = 0,
     private readonly tags: Tags = {},
     private readonly log_interval = DEFAULT_LOG_INTERVAL,
+    private readonly last_log_time = Date.now()
   ) {
-    this.last_log_time = Date.now()
   }
 
   increment(amount = 1): Counter {
     if (this.ready_to_log()) {
       return new Counter(
         this.metric,
-        this.value + 1,
+        this.value + amount,
         this.tags,
         this.log_interval,
       ).pop()
     }
-    return new Counter(this.metric, this.value + amount, this.tags, this.log_interval)
+    return new Counter(this.metric, this.value + amount, this.tags, this.log_interval, this.last_log_time)
   }
 
   // Must be called at the end of processing
@@ -64,14 +63,9 @@ export class Counter {
     return Date.now() - this.last_log_time > this.log_interval
   }
 
-  private pop(): Counter {
+  private pop(): this {
     new Point("counter", this.metric, this.value, this.tags).log()
-    return new Counter(
-      this.metric,
-      0,
-      this.tags,
-      this.log_interval,
-    )
+    return this
   }
 }
 
