@@ -14,8 +14,8 @@ export interface SchemaMessageContent {
   stream: string
   schema: Schema,
   key_properties: string[]
-  cleaningColumn?: string
-  cleanFirst: boolean
+  cleaning_column?: string
+  clean_first: boolean
   bookmark_properties?: string[]
   all_key_properties?: MutableSchemaKeyProperties
 }
@@ -79,8 +79,7 @@ export class SchemaMessage extends Message {
     public readonly bookmarkProperties?: List<string>,
     public readonly cleaningColumn?: string,
     public readonly cleanFirst = false,
-    public readonly allKeyProperties?: SchemaKeyProperties
-
+    public readonly allKeyProperties?: SchemaKeyProperties,
   ) {
     super()
   }
@@ -91,8 +90,8 @@ export class SchemaMessage extends Message {
       stream: this.stream,
       schema: this.schema,
       key_properties: this.keyProperties.toArray(),
-      cleanFirst: this.cleanFirst,
-      cleaningColumn: this.cleaningColumn,
+      clean_first: this.cleanFirst,
+      cleaning_column: this.cleaningColumn,
       all_key_properties: schemaKeyPropertiesToMutable(this.allKeyProperties),
       ...(this.bookmarkProperties && {bookmark_properties: this.bookmarkProperties.toArray()}),
     }
@@ -155,12 +154,20 @@ export function parse_message(msg: string): RecordMessage | StateMessage | Schem
 
 export const format_message = (message: Message) => JSON.stringify(message.asObject())
 
-export const write_message = (message: Message) => console.log(message)
+export const write_message = (message: Message) => console.log(JSON.stringify(message.asObject()))
 
 export const write_record = (stream: string, record: Record<string, any>, stream_alias?: string, time_extracted?: TimeExtracted) => write_message(new RecordMessage(stream_alias || stream, record, undefined, time_extracted))
 
 export const write_records = (stream: string, records: List<Record<string, any>>) => records.forEach((record) => write_record(stream, record))
 
-export const write_schema = (stream: string, schema: Schema, key_properties: List<string>, bookmark_properties?: List<string>, stream_alias?: string) => write_message(new SchemaMessage(stream_alias || stream, schema, key_properties, bookmark_properties))
+export const write_schema = (stream: string,
+                             schema: Schema,
+                             key_properties: List<string>,
+                             bookmark_properties?: List<string>,
+                             stream_alias?: string,
+                             cleaningColumn?: string,
+                             cleanFirst = false,
+                             allKeyProperties?: SchemaKeyProperties,
+) => write_message(new SchemaMessage(stream_alias || stream, schema, key_properties, bookmark_properties, cleaningColumn, cleanFirst, allKeyProperties))
 
 export const write_state = (value: StateProps) => write_message(new StateMessage(value))

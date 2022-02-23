@@ -1,7 +1,12 @@
-import {List} from "immutable"
+import {List, Record} from "immutable"
 import {Command, Option} from "commander"
 import * as fs from "fs"
+import {Catalog} from "./Catalog"
+import {StateProps} from "./bookmarks"
 
+export const StateFactory = Record<StateProps>({
+  bookmarks: {},
+})
 export function load_json(filePath: string) {
   return JSON.parse(fs.readFileSync(filePath).toString())
 }
@@ -39,8 +44,8 @@ export function parse_args(required_keys: List<string>, additionalOptions: List<
     state_path: opts.state,
     catalog_path: opts.catalog,
     config: load_json(opts.config),
-    state: opts.state && load_json(opts.state),
-    catalog: opts.catalog && load_json(opts.catalog),
+    state: opts.state ? StateFactory(load_json(opts.state)) : StateFactory(),
+    catalog: opts.catalog ? Catalog.fromJSON(load_json(opts.catalog)) : undefined,
     opts
   }
 
