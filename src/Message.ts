@@ -50,6 +50,7 @@ export enum MessageType {
 type TimeExtracted = number
 
 export abstract class Message {
+  public abstract type:MessageType
   public abstract asObject(): MessageContent;
 }
 
