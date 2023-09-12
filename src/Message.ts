@@ -37,19 +37,27 @@ export interface ActiveStreamsMessageContent {
   streams: string[]
 }
 
-export type MessageContent = SchemaMessageContent | StateMessageContent | RecordMessageContent | ActiveStreamsMessageContent
+export interface ActivateVersionMessageContent {
+  type: MessageType.activateVersion
+  stream: string
+  version: number
+}
+
+export type MessageContent = SchemaMessageContent | StateMessageContent | RecordMessageContent | ActivateVersionMessageContent | ActiveStreamsMessageContent
 
 export enum MessageType {
   record = 'RECORD',
   schema = 'SCHEMA',
   state = 'STATE',
-  activeStreams = 'ACTIVE_STREAMS'
+  activeStreams = 'ACTIVE_STREAMS',
+  activateVersion = 'ACTIVATE_VERSION',
 }
 
 // Not timezone aware, could be improved
 type TimeExtracted = number
 
 export abstract class Message {
+  public abstract type:MessageType
   public abstract asObject(): MessageContent;
 }
 
@@ -139,6 +147,25 @@ export class StateMessage extends Message {
   }
 }
 
+export class ActivateVersionMessage extends Message {
+  readonly type = MessageType.activateVersion
+
+  constructor(
+    public readonly stream: string,
+    public readonly version: number,
+  ) {
+    super()
+  }
+
+  public asObject(): ActivateVersionMessageContent {
+    return {
+      type: MessageType.activateVersion,
+      stream: this.stream,
+      version: this.version,
+    }
+  }
+}
+
 // Throw exceptions if key not in record. Otherwise, return value.
 function ensure_key_defined(obj: Record<string, any>, key: string) {
   if (!Object.keys(obj).includes(key)) {
@@ -147,7 +174,7 @@ function ensure_key_defined(obj: Record<string, any>, key: string) {
   return obj[key]
 }
 
-export function parse_message(msg: string): RecordMessage | StateMessage | SchemaMessage | ActiveStreamsMessage | undefined {
+export function parse_message(msg: string): RecordMessage | StateMessage | SchemaMessage | ActivateVersionMessage | ActiveStreamsMessage | undefined {
   const obj = JSON.parse(msg)
   const msg_type: MessageType = ensure_key_defined(obj, "type")
 
@@ -173,6 +200,11 @@ export function parse_message(msg: string): RecordMessage | StateMessage | Schem
       return new StateMessage(ensure_key_defined(obj, 'value'))
     case MessageType.activeStreams:
       return new ActiveStreamsMessage(ensure_key_defined(obj, "streams"))
+    case MessageType.activateVersion:
+      return new ActivateVersionMessage(
+        ensure_key_defined(obj, "stream"),
+        ensure_key_defined(obj, 'version'),
+      )
     default:
       log_warning(`Message type not handled : ${msg_type}`)
       return undefined
@@ -187,14 +219,20 @@ export const write_record = (stream: string, record: Record<string, any>, stream
 
 export const write_records = (stream: string, records: List<Record<string, any>>) => records.forEach((record) => write_record(stream, record))
 
-export const write_schema = (stream: string,
-                             schema: Schema,
-                             key_properties: List<string>,
-                             bookmark_properties?: List<string>,
-                             stream_alias?: string,
-                             cleaningColumn?: string,
-                             cleanFirst = false,
-                             allKeyProperties?: SchemaKeyProperties,
+export const write_schema = (
+  stream: string,
+  schema: Schema,
+  key_properties: List<string>,
+  bookmark_properties?: List<string>,
+  stream_alias?: string,
+  cleaningColumn?: string,
+  cleanFirst = false,
+  allKeyProperties?: SchemaKeyProperties,
 ) => write_message(new SchemaMessage(stream_alias || stream, schema, key_properties, bookmark_properties, cleaningColumn, cleanFirst, allKeyProperties))
 
 export const write_state = (value: StateProps) => write_message(new StateMessage(value))
+
+export const write_activate_version = (
+  stream: string,
+  version: number,
+) => write_message(new ActivateVersionMessage(stream, version))
