@@ -7,6 +7,7 @@ import {
 } from "./Schema"
 import {List} from "immutable"
 import {StateProps} from "./bookmarks"
+import {log_warning} from "./logger"
 
 
 export interface SchemaMessageContent {
@@ -31,12 +32,18 @@ export interface RecordMessageContent {
   stream: string
 }
 
-export type MessageContent = SchemaMessageContent | StateMessageContent | RecordMessageContent
+export interface ActiveStreamsMessageContent {
+  type: MessageType.activeStreams
+  streams: string[]
+}
+
+export type MessageContent = SchemaMessageContent | StateMessageContent | RecordMessageContent | ActiveStreamsMessageContent
 
 export enum MessageType {
   record = 'RECORD',
   schema = 'SCHEMA',
   state = 'STATE',
+  activeStreams = 'ACTIVE_STREAMS'
 }
 
 // Not timezone aware, could be improved
@@ -98,6 +105,23 @@ export class SchemaMessage extends Message {
   }
 }
 
+export class ActiveStreamsMessage extends Message {
+  readonly type = MessageType.activeStreams
+
+  constructor(
+    public readonly streams: List<string>,
+  ) {
+    super()
+  }
+
+  public asObject(): ActiveStreamsMessageContent {
+    return {
+      type: this.type,
+      streams: this.streams.toArray()
+    }
+  }
+}
+
 export class StateMessage extends Message {
   readonly type = MessageType.state
 
@@ -123,7 +147,7 @@ function ensure_key_defined(obj: Record<string, any>, key: string) {
   return obj[key]
 }
 
-export function parse_message(msg: string): RecordMessage | StateMessage | SchemaMessage {
+export function parse_message(msg: string): RecordMessage | StateMessage | SchemaMessage | ActiveStreamsMessage | undefined {
   const obj = JSON.parse(msg)
   const msg_type: MessageType = ensure_key_defined(obj, "type")
 
@@ -147,8 +171,11 @@ export function parse_message(msg: string): RecordMessage | StateMessage | Schem
       )
     case MessageType.state:
       return new StateMessage(ensure_key_defined(obj, 'value'))
+    case MessageType.activeStreams:
+      return new ActiveStreamsMessage(ensure_key_defined(obj, "streams"))
     default:
-      throw new Error(`Unknown message type '${msg_type}'`)
+      log_warning(`Message type not handled : ${msg_type}`)
+      return undefined
   }
 }
 
