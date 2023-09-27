@@ -1,4 +1,3 @@
-import {List} from "immutable"
 import {ExtendedJSONSchema7} from "./Schema"
 
 export enum ReplicationMethod {
@@ -12,15 +11,15 @@ export enum Inclusion {
 }
 
 interface ReplicationMetadata {
-  "table-key-properties"?: List<string>;
+  "table-key-properties"?: string[];
   "forced-replication-method"?: string;
-  "valid-replication-keys"?: List<string>;
+  "valid-replication-keys"?: string[];
   selected?: boolean;
   inclusion?: Inclusion;
 }
 
 interface CatalogMetadata {
-  breadcrumb: List<string>;
+  breadcrumb: string[];
   metadata: ReplicationMetadata;
 }
 
@@ -28,24 +27,24 @@ interface CatalogMetadata {
 export function get_standard_metadata(
   schema?: ExtendedJSONSchema7,
   schemaName?: string,
-  key_properties?: List<string>,
-  valid_replication_keys?: List<string>,
+  key_properties?: string[],
+  valid_replication_keys?: string[],
   replication_method?: ReplicationMethod,
-): List<CatalogMetadata> {
+): CatalogMetadata[] {
 
-  return List<CatalogMetadata>([{
-    breadcrumb: List(),
+  return ([{
+    breadcrumb: [],
     metadata: {
       "table-key-properties": key_properties,
       "forced-replication-method": replication_method,
       "valid-replication-keys": valid_replication_keys,
       selected: false // by default a stream is not selected
     }
-  }]) // first elem represents Stream metadata
+  }] as CatalogMetadata[]) // first elem represents Stream metadata
     .concat(Object.keys(schema?.properties ?? {}).map((key) => ({
       metadata: {
         inclusion: key_properties?.includes(key) ? Inclusion.automatic : Inclusion.available
       },
-      breadcrumb: List(["properties", key])
+      breadcrumb: (["properties", key])
     })))
 }

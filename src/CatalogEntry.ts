@@ -1,16 +1,15 @@
 import {Schema} from "./Schema"
-import {List} from "immutable"
 
 interface ReplicationMetadata {
-  "table-key-properties"?: List<string>;
+  "table-key-properties"?: string[];
   "forced-replication-method"?: string;
-  "valid-replication-keys"?: List<string>;
+  "valid-replication-keys"?: string[];
   selected?: boolean;
   inclusion?: string;
 }
 
 interface CatalogMetadata {
-  breadcrumb: List<string>
+  breadcrumb: string[]
   metadata: ReplicationMetadata
 }
 
@@ -18,8 +17,8 @@ interface ICatalogEntry {
   tap_stream_id?: string
   stream?: string
   schema?: Schema
-  metadata?: List<CatalogMetadata>
-  key_properties?: List<string>
+  metadata?: CatalogMetadata[]
+  key_properties?: string[]
   replication_key?: string
   is_view?: boolean
   database?: string
@@ -78,16 +77,16 @@ export class CatalogEntry implements ICatalogEntry {
   static fromJSON = (c: Record<string, any>) => new CatalogEntry({
     ...c,
     schema: Schema.fromJSON(c.schema),
-    metadata: List(List(c.metadata.map((mdata: any) => ({
-      breadcrumb: List(mdata.breadcrumb),
+    metadata: c.metadata.map((mdata: any) => ({
+      breadcrumb: mdata.breadcrumb,
       metadata: {
         ...mdata.metadata,
-        "table-key-properties": List(mdata.metadata["table-key-properties"]),
-        "valid-replication-keys": List(mdata.metadata["valid-replication-keys"]),
+        "table-key-properties": mdata.metadata["table-key-properties"],
+        "valid-replication-keys": mdata.metadata["valid-replication-keys"],
       }
-    }))))
+    }))
   })
 
   // Metadata for the stream has en empty breadcrumb
-  is_selected = () => this.schema?.selected || this.metadata?.find((mdata) => mdata.breadcrumb.isEmpty())?.metadata.selected
+  is_selected = () => this.schema?.selected || this.metadata?.find((mdata) => mdata.breadcrumb.length === 0)?.metadata.selected
 }

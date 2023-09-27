@@ -1,11 +1,4 @@
-import {
-  MutableSchemaKeyProperties,
-  Schema,
-  SchemaKeyProperties,
-  schemaKeyPropertiesToImmutable,
-  schemaKeyPropertiesToMutable,
-} from "./Schema"
-import {List} from "immutable"
+import {Schema, SchemaKeyProperties} from "./Schema"
 import {StateProps} from "./bookmarks"
 import {log_warning} from "./logger"
 
@@ -18,7 +11,7 @@ export interface SchemaMessageContent {
   cleaning_column?: string
   clean_first: boolean
   bookmark_properties?: string[]
-  all_key_properties?: MutableSchemaKeyProperties
+  all_key_properties?: SchemaKeyProperties
 }
 
 export interface StateMessageContent {
@@ -90,8 +83,8 @@ export class SchemaMessage extends Message {
   constructor(
     public readonly stream: string,
     public readonly schema: Schema,
-    public readonly keyProperties: List<string>,
-    public readonly bookmarkProperties?: List<string>,
+    public readonly keyProperties: string[],
+    public readonly bookmarkProperties?: string[],
     public readonly cleaningColumn?: string,
     public readonly cleanFirst = false,
     public readonly allKeyProperties?: SchemaKeyProperties,
@@ -104,11 +97,11 @@ export class SchemaMessage extends Message {
       type: MessageType.schema,
       stream: this.stream,
       schema: this.schema,
-      key_properties: this.keyProperties.toArray(),
+      key_properties: this.keyProperties,
       clean_first: this.cleanFirst,
       cleaning_column: this.cleaningColumn,
-      all_key_properties: schemaKeyPropertiesToMutable(this.allKeyProperties),
-      ...(this.bookmarkProperties && {bookmark_properties: this.bookmarkProperties.toArray()}),
+      all_key_properties: this.allKeyProperties,
+      ...(this.bookmarkProperties && {bookmark_properties: this.bookmarkProperties}),
     }
   }
 }
@@ -117,7 +110,7 @@ export class ActiveStreamsMessage extends Message {
   readonly type = MessageType.activeStreams
 
   constructor(
-    public readonly streams: List<string>,
+    public readonly streams: string[],
   ) {
     super()
   }
@@ -125,7 +118,7 @@ export class ActiveStreamsMessage extends Message {
   public asObject(): ActiveStreamsMessageContent {
     return {
       type: this.type,
-      streams: this.streams.toArray()
+      streams: this.streams
     }
   }
 }
@@ -190,11 +183,11 @@ export function parse_message(msg: string): RecordMessage | StateMessage | Schem
       return new SchemaMessage(
         ensure_key_defined(obj, "stream"),
         ensure_key_defined(obj, "schema"),
-        List(ensure_key_defined(obj, "key_properties")),
-        List(obj["bookmark_properties"] ?? []),
+        ensure_key_defined(obj, "key_properties"),
+        obj["bookmark_properties"] ?? [],
         obj["cleaning_column"],
         obj["clean_first"],
-        schemaKeyPropertiesToImmutable(obj["all_key_properties"]),
+        obj["all_key_properties"],
       )
     case MessageType.state:
       return new StateMessage(ensure_key_defined(obj, 'value'))
@@ -217,13 +210,13 @@ export const write_message = (message: Message) => console.log(JSON.stringify(me
 
 export const write_record = (stream: string, record: Record<string, any>, stream_alias?: string, time_extracted?: TimeExtracted) => write_message(new RecordMessage(stream_alias || stream, record, undefined, time_extracted))
 
-export const write_records = (stream: string, records: List<Record<string, any>>) => records.forEach((record) => write_record(stream, record))
+export const write_records = (stream: string, records: Record<string, any>[]) => records.forEach((record) => write_record(stream, record))
 
 export const write_schema = (
   stream: string,
   schema: Schema,
-  key_properties: List<string>,
-  bookmark_properties?: List<string>,
+  key_properties: string[],
+  bookmark_properties?: string[],
   stream_alias?: string,
   cleaningColumn?: string,
   cleanFirst = false,

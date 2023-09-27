@@ -23,9 +23,14 @@
   },
   "homepage": "https://github.com/Biron-BI/singer-node#readme",
   "dependencies": {
+    "@types/lodash.get": "^4.4.7",
+    "@types/lodash.unset": "^4.5.7",
+    "@types/lodash.update": "^4.10.7",
     "commander": "^8.3.0",
-    "immutable": "^4.0.0",
-    "json-schema-ref-parser": "^9.0.9"
+    "json-schema-ref-parser": "^9.0.9",
+    "lodash.get": "^4.4.2",
+    "lodash.unset": "^4.5.2",
+    "lodash.update": "^4.10.2"
   },
   "devDependencies": {
     "@types/json-schema": "^7.0.9",
