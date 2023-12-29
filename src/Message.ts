@@ -25,6 +25,12 @@ export interface RecordMessageContent {
   stream: string
 }
 
+export interface DeletedRecordMessageContent {
+  type: MessageType.deletedRecord
+  record: Record<string, any>
+  stream: string
+}
+
 export interface ActiveStreamsMessageContent {
   type: MessageType.activeStreams
   streams: string[]
@@ -36,10 +42,11 @@ export interface ActivateVersionMessageContent {
   version: number
 }
 
-export type MessageContent = SchemaMessageContent | StateMessageContent | RecordMessageContent | ActivateVersionMessageContent | ActiveStreamsMessageContent
+export type MessageContent = SchemaMessageContent | StateMessageContent | RecordMessageContent | ActivateVersionMessageContent | ActiveStreamsMessageContent | DeletedRecordMessageContent
 
 export enum MessageType {
   record = 'RECORD',
+  deletedRecord = 'DELETED_RECORD',
   schema = 'SCHEMA',
   state = 'STATE',
   activeStreams = 'ACTIVE_STREAMS',
@@ -73,6 +80,27 @@ export class RecordMessage extends Message {
       record: this.record,
       ...(this.version && {version: this.version}),
       ...(this.time_extracted && {time_extracted: this.time_extracted}),
+    }
+  }
+}
+
+export class DeletedRecordMessage extends Message {
+  readonly type = MessageType.deletedRecord
+
+  constructor(
+    public readonly stream: string,
+    public readonly record: Record<string, any>,
+    public readonly version?: string,
+    public readonly time_extracted?: TimeExtracted,
+  ) {
+    super()
+  }
+
+  public asObject(): DeletedRecordMessageContent {
+    return {
+      type: this.type,
+      stream: this.stream,
+      record: this.record,
     }
   }
 }
@@ -167,7 +195,7 @@ function ensure_key_defined(obj: Record<string, any>, key: string) {
   return obj[key]
 }
 
-export function parse_message(msg: string): RecordMessage | StateMessage | SchemaMessage | ActivateVersionMessage | ActiveStreamsMessage | undefined {
+export function parse_message(msg: string): RecordMessage | StateMessage | SchemaMessage | ActivateVersionMessage | ActiveStreamsMessage | DeletedRecordMessage| undefined {
   const obj = JSON.parse(msg)
   const msg_type: MessageType = ensure_key_defined(obj, "type")
 
@@ -197,6 +225,11 @@ export function parse_message(msg: string): RecordMessage | StateMessage | Schem
       return new ActivateVersionMessage(
         ensure_key_defined(obj, "stream"),
         ensure_key_defined(obj, 'version'),
+      )
+    case MessageType.deletedRecord:
+      return new DeletedRecordMessage(
+        ensure_key_defined(obj, "stream"),
+        ensure_key_defined(obj, "record"),
       )
     default:
       log_warning(`Message type not handled : ${msg_type}`)
