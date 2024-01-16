@@ -1,6 +1,6 @@
 import {Schema} from "./Schema"
 
-interface ReplicationMetadata {
+export interface ReplicationMetadata {
   "table-key-properties"?: string[];
   "forced-replication-method"?: string;
   "valid-replication-keys"?: string[];
@@ -8,12 +8,12 @@ interface ReplicationMetadata {
   inclusion?: string;
 }
 
-interface CatalogMetadata {
+export interface CatalogMetadata {
   breadcrumb: string[]
   metadata: ReplicationMetadata
 }
 
-interface ICatalogEntry {
+export interface ICatalogEntry {
   tap_stream_id?: string
   stream?: string
   schema?: Schema
