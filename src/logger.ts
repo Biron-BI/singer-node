@@ -1,3 +1,5 @@
+import {Writable} from "node:stream"
+
 export enum LogLevel {
   TRACE,
   DEBUG,
@@ -11,9 +13,11 @@ let configLevel = LogLevel.TRACE
 
 let prefix = ""
 
+let writeStream: Writable = process.stderr
+
 function write(logLevel: LogLevel, msg: string) {
   if (logLevel >= configLevel) {
-    process.stderr.write(`${prefix && `[${prefix}] `}[${LogLevel[logLevel]}] ${msg}\n`)
+    writeStream.write(`${prefix && `[${prefix}] `}[${LogLevel[logLevel]}] ${msg}\n`)
   }
 }
 
@@ -32,4 +36,6 @@ export const log_fatal = (msg: string) => write(LogLevel.FATAL, msg)
 export const set_level = (newLevel: LogLevel) => configLevel = newLevel
 
 export const set_prefix = (newPrefix: string) => prefix = newPrefix
+
+export const set_write_stream = (newWriteStream: Writable) => writeStream = newWriteStream
 
