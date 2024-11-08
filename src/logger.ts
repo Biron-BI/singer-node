@@ -13,11 +13,18 @@ let configLevel = LogLevel.TRACE
 
 let prefix = ""
 
-let writeStream: Writable = process.stderr
+let writeStreams: Record<LogLevel, Writable> = {
+  [LogLevel.TRACE]: process.stderr,
+  [LogLevel.DEBUG]: process.stderr,
+  [LogLevel.INFO]: process.stderr,
+  [LogLevel.WARN]: process.stderr,
+  [LogLevel.ERROR]: process.stderr,
+  [LogLevel.FATAL]: process.stderr,
+}
 
 function write(logLevel: LogLevel, msg: string) {
   if (logLevel >= configLevel) {
-    writeStream.write(`${prefix && `[${prefix}] `}[${LogLevel[logLevel]}] ${msg}\n`)
+    writeStreams[logLevel].write(`${prefix && `[${prefix}] `}[${LogLevel[logLevel]}] ${msg}\n`)
   }
 }
 
@@ -37,5 +44,5 @@ export const set_level = (newLevel: LogLevel) => configLevel = newLevel
 
 export const set_prefix = (newPrefix: string) => prefix = newPrefix
 
-export const set_write_stream = (newWriteStream: Writable) => writeStream = newWriteStream
+export const set_write_stream = (logLevel: LogLevel, newWriteStream: Writable) => writeStreams[logLevel] = newWriteStream
 
