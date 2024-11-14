@@ -40,9 +40,9 @@ export const log_critical = (msg: string) => write(LogLevel.FATAL, msg)
 
 export const log_fatal = (msg: string) => write(LogLevel.FATAL, msg)
 
-export const set_level = (newLevel: LogLevel) => configLevel = newLevel
+export const set_log_level = (newLevel: LogLevel) => configLevel = newLevel
 
-export const set_prefix = (newPrefix: string) => prefix = newPrefix
+export const set_log_prefix = (newPrefix: string) => prefix = newPrefix
 
-export const set_write_stream = (logLevel: LogLevel, newWriteStream: Writable) => writeStreams[logLevel] = newWriteStream
+export const set_log_stream = (logLevel: LogLevel, writeStream: Writable) => writeStreams[logLevel] = writeStream
 

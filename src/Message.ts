@@ -1,6 +1,7 @@
 import {Schema, SchemaKeyProperties} from "./Schema"
 import {StateProps} from "./bookmarks"
 import {log_warning} from "./logger"
+import {write_line} from "./output"
 
 
 export interface SchemaMessageContent {
@@ -239,7 +240,7 @@ export function parse_message(msg: string): RecordMessage | StateMessage | Schem
 
 export const format_message = (message: Message) => JSON.stringify(message.asObject())
 
-export const write_message = (message: Message) => console.log(JSON.stringify(message.asObject()))
+export const write_message = (message: Message) => write_line(JSON.stringify(message.asObject()))
 
 export const write_record = (stream: string, record: Record<string, any>, stream_alias?: string, time_extracted?: TimeExtracted) => write_message(new RecordMessage(stream_alias || stream, record, undefined, time_extracted))
 

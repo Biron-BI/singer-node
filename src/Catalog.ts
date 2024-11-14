@@ -1,6 +1,7 @@
 import {log_info, log_warning} from "./logger"
 import {CatalogEntry} from "./CatalogEntry"
 import {State} from "./bookmarks"
+import {write_line} from "./output"
 
 export class Catalog {
   constructor(private readonly streams: CatalogEntry[]) {
@@ -16,7 +17,7 @@ export class Catalog {
     if (this.streams.length === 0) {
       log_warning("Catalog being written with no streams.")
     }
-    console.log(this.toJSON())
+    write_line(this.toJSON())
   }
 
   toJSON() {
